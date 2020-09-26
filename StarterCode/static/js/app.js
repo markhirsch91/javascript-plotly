@@ -50,7 +50,7 @@ function buildCharts(sample) {
             {
                 y: ticksY,
                 x: sample_values.slice(0,10).reverse(),
-                text: otu_lables.slice(0,10).reverse(),
+                text: otu_labels.slice(0,10).reverse(),
                 type: "bar",
                 orientation: "h"
             }
@@ -64,5 +64,28 @@ function buildCharts(sample) {
 }
 
 function init() {
+    var dropdownSelector = d3.select("#selDataset");
     
+    d3.json("samples.json").then((data) => {
+        var sample_names = data.names;
+        
+        sample_names.forEach((sample) => {
+            dropdownSelector
+                .append("option")
+                .text(sample)
+                .property("value", sample);
+        });
+
+        var firstSample = sample_names[0];
+        buildCharts(firstSample);
+        buildMetadata(firstSample);
+    });
 }
+
+
+function optionChanged(nextSameple) {
+    buildCharts(nextSameple);
+    buildMetadata(nextSameple)
+}
+
+init();
