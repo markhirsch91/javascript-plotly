@@ -1,95 +1,68 @@
-//The Dropdown actions
-function grabMetadata(sample) {
+function buildMetadata (sample) {
     d3.json("samples.json").then((data) => {
-        var panel = d3.select("#sample-metadata")
+        var metadata = data.metadata;
+        var idArray = metadata.filter(sampleObject => sampleObject.id == sample);
+        var resultIDs = idArray[0];
+        var panel = d3.select("#sample-metadata");
         panel.html("");
-        Object.entries(data).forEach(([key,value]) => {
-            panel.append("h6").text(`${key}:${value}`);
-        })
-        
+        Object.entries(resultIDs).forEach(([key, value]) => {
+            panel.append("h6").text(`${key.toUpperCase()}: ${value}`);
+        });
     })
 }
 
-//Here we will build the charts and assign the proper data
-
-function buildPlots(sample) {
+function buildCharts(sample) {
     d3.json("samples.json").then((data) => {
-        // @TODO: Build a Bubble Chart Using the Sample Data
-        const otu_ids = data.otu_ids;
-        const otu_labels = data.otu_labels;
-        const sample_values = data.sample_values;
-        // @TODO: Build a Pie Chart
-        let bubbleLayout = {
-          margin: { t: 0 },
-          hovermode: "closests",
-          xaxis: { title: "OTU ID"}
-        }
-        let bubbleData = [
+        var samples = data.samples;
+        var idArray = samples.filter(sampleObject => sampleObject.id == sample);
+        var resultIDs = idArray[0];
+
+        var otu_ids = resultIDs.otu_ids;
+        var otu_labels = resultIDs.otu_labels;
+        var sample_values = resultIDs.sample_values;
+
+        //Bubble Chart Setup
+        var layoutBubble = {
+            title: "BUBBLE CHART",
+            margin: { t: 0},
+            hovermode: "closest",
+            xaxis: { title: "IDs"},
+            margin: { t: 30}
+        };
+        var dataBubble = [
             {
-              x: otu_ids,
-              y: sample_values,
-              text: otu_labels,
-              mode: "markers",
-              marker: {
-                size: sample_values,
-                color: otu_ids,
-                colorscale: "Earth"
-              }
+                x: otu_ids,
+                y: sample_values,
+                text: otu_labels,
+                mode: "markers",
+                marker: {
+                    size: sample_values,
+                    color: otu_ids,
+                    colorscale: "Electric"
+                }
             }
-          ]
-      
-          Plotly.plot("bubble", bubbleData, bubbleLayout);
-
-
-function init() {
-    var subjectSelector = d3.select("#selDataset");
-    d3.json("samples.json").then((data) => {
-        var sampleNames = data.names;
-        sampleNames.forEach((sample) => {
-            subjectSelector
-                .append("option")
-                .text(sample)
-                .property("value", sample);
-        });
-    
-const firstSample = sampleNames[0];
-buildPlots(firstSample);
-grabMetadata(firstSample);
+        ];
+        Plotly.newPlot("bubble", dataBubble, layoutBubble);
+        
+        // Bar Chart Setup
+        var ticksY = otu_ids.slice(0,10).map(otuID => `OTU ${otuID}`).reverse();
+        var dataBar = [
+            {
+                y: ticksY,
+                x: sample_values.slice(0,10).reverse(),
+                text: otu_lables.slice(0,10).reverse(),
+                type: "bar",
+                orientation: "h"
+            }
+        ];
+        var layoutBar = {
+            title: "BAR CHART",
+            margin: {t: 30, l: 150}
+        };
+        Plotly.newPlot("bar", dataBar, layoutBar);
     });
 }
-function optionChanged(newSample) {
-    buildPlots(newSample);
-    grabMetadata(newSample);
+
+function init() {
+    
 }
-
-
-
-
-init();
-
-
-
-
-
-
-
-// d3.json("samples.json").then((data) => {
-//     const otu_ids = data.otu_ids;
-//     const otu_labels = data.otu_labels;
-//     let layoutBubbles = {
-//         margin: {t:0},
-//         hovermode: "closests",
-//         xaxis: {
-//             title:"OTU ID"
-//         }
-//     }
-//     var trace1 = {
-//         x: otu_ids,
-//         y: sample_values,
-//         text: otu_labels,
-//         mode: "markers",
-//         marker: {size: sample_values, color: otu_ids, colorscale: "Earth"}
-//             }
-// bubbleData = [trace1];
-// Plotly.plot("bubble", bubbleData, layoutBubbles);
-//         }
