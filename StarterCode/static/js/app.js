@@ -1,3 +1,4 @@
+//Function to build the metadata on the page
 function buildMetadata (sample) {
     d3.json("samples.json").then((data) => {
         var metadata = data.metadata;
@@ -11,6 +12,7 @@ function buildMetadata (sample) {
     })
 }
 
+//Function to build the bubble and bar charts
 function buildCharts(sample) {
     d3.json("samples.json").then((data) => {
         var samples = data.samples;
@@ -24,10 +26,10 @@ function buildCharts(sample) {
         //Bubble Chart Setup
         var layoutBubble = {
             title: "BUBBLE CHART",
-            margin: { t: 0},
+            margin: { t: 20},
             hovermode: "closest",
-            xaxis: { title: "IDs"},
-            margin: { t: 30}
+            xaxis: { title: "OTU ID"},
+            margin: { t: 50}
         };
         var dataBubble = [
             {
@@ -42,7 +44,7 @@ function buildCharts(sample) {
                 }
             }
         ];
-        Plotly.newPlot("bubble", dataBubble, layoutBubble);
+        Plotly.newPlot("bubble", dataBubble, layoutBubble); //Creating the Bubble chart
         
         // Bar Chart Setup
         var ticksY = otu_ids.slice(0,10).map(otuID => `OTU ${otuID}`).reverse();
@@ -57,12 +59,34 @@ function buildCharts(sample) {
         ];
         var layoutBar = {
             title: "BAR CHART",
-            margin: {t: 30, l: 150}
+            margin: {t: 40, l: 100}
         };
-        Plotly.newPlot("bar", dataBar, layoutBar);
+        Plotly.newPlot("bar", dataBar, layoutBar); //Creating the Bar chart
+
+
+        // // Gauge Chart Setup
+        // var dataGauge = [
+        //     {
+        //         domain: { x: [0,1], y: [0,1] },
+        //         value: 270,
+        //         title: { text: "GAUGE CHART"},
+        //         type: "indicator",
+        //         mode: "gauge+number"
+        //     }
+        // ];
+        // var layoutGauge = {
+        //     width: 600,
+        //     height: 500,
+        //     margin: { t: 0, b: 0 }
+        // };
+        // Plotly.newPlot("gauge", dataGauge, layoutGauge);
+
+
     });
 }
 
+
+//Initialize the data within the dropbown
 function init() {
     var dropdownSelector = d3.select("#selDataset");
     
@@ -76,9 +100,9 @@ function init() {
                 .property("value", sample);
         });
 
-        var firstSample = sample_names[0];
-        buildCharts(firstSample);
-        buildMetadata(firstSample);
+        var originalSample = sample_names[0];
+        buildCharts(originalSample);
+        buildMetadata(originalSample);
     });
 }
 
